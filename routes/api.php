@@ -1,12 +1,18 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\TagController as AdminTagController;
+use App\Http\Controllers\Admin\TaskController as AdminTaskController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\OverdueNotificationController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,13 +25,30 @@ Route::prefix('v1')->group(function (): void {
     Route::post('auth/logout', [AuthController::class, 'logout'])
         ->middleware('auth:sanctum');
 
-    Route::middleware('auth:sanctum')->group(function (): void {
+    Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
+        Route::prefix('admin')->name('admin.')->middleware('admin')->group(function (): void {
+            Route::get('dashboard', AdminDashboardController::class)->name('dashboard');
+            Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+            Route::get('users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+            Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+            Route::delete('users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+            Route::apiResource('projects', AdminProjectController::class)->only(['index', 'show', 'update', 'destroy']);
+            Route::apiResource('tasks', AdminTaskController::class)->only(['index', 'show', 'update', 'destroy']);
+            Route::apiResource('tags', AdminTagController::class)->only(['index', 'show', 'update', 'destroy']);
+        });
+
         Route::get('dashboard', DashboardController::class);
         Route::get('activity-logs', [ActivityLogController::class, 'index']);
         Route::get('activity-logs/{activityLog}', [ActivityLogController::class, 'show']);
         Route::get('notifications', [OverdueNotificationController::class, 'index']);
         Route::get('notifications/{notification}', [OverdueNotificationController::class, 'show']);
         Route::apiResource('projects', ProjectController::class);
+        Route::apiResource('tags', TagController::class);
+
+        Route::put('projects/{project}/tags/{tag}', [TagController::class, 'attachToProject']);
+        Route::delete('projects/{project}/tags/{tag}', [TagController::class, 'detachFromProject']);
+        Route::put('tasks/{task}/tags/{tag}', [TagController::class, 'attachToTask']);
+        Route::delete('tasks/{task}/tags/{tag}', [TagController::class, 'detachFromTask']);
 
         Route::get('projects/{project}/tasks', [TaskController::class, 'index']);
         Route::post('projects/{project}/tasks', [TaskController::class, 'store']);

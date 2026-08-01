@@ -51,7 +51,7 @@ class TaskController extends Controller
         $this->authorize('view', $task->project);
 
         return $this->successResponse(
-            new TaskResource($task->load(['comments.user', 'comments.media', 'media'])),
+            new TaskResource($task->load(['comments.user', 'comments.media', 'media', 'tags'])),
             'Task retrieved successfully.',
         );
     }

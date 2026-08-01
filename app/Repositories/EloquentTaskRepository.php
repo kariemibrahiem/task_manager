@@ -12,6 +12,7 @@ class EloquentTaskRepository implements TaskRepositoryInterface
     public function paginateForProject(Project $project, array $filters, int $perPage): LengthAwarePaginator
     {
         return $project->tasks()
+            ->with('tags')
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['priority'] ?? null, fn ($query, $priority) => $query->where('priority', $priority))
             ->when($filters['search'] ?? null, function ($query, string $search): void {
@@ -23,14 +24,14 @@ class EloquentTaskRepository implements TaskRepositoryInterface
 
     public function createForProject(Project $project, array $attributes): Task
     {
-        return $project->tasks()->create($attributes);
+        return $project->tasks()->create($attributes)->load('tags');
     }
 
     public function update(Task $task, array $attributes): Task
     {
         $task->update($attributes);
 
-        return $task->refresh();
+        return $task->refresh()->load('tags');
     }
 
     public function delete(Task $task): void

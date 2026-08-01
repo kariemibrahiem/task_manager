@@ -21,6 +21,7 @@ class TaskResource extends JsonResource
             'completed_at' => $this->completed_at,
             'comments' => CommentResource::collection($this->whenLoaded('comments')),
             'media' => MediaResource::collection($this->whenLoaded('media')),
+            'tags' => TagResource::collection($this->whenLoaded('tags')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
