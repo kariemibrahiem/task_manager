@@ -1,0 +1,232 @@
+{
+    "info": {
+        "_postman_id": "be21e3a7-b667-4e47-b745-41f8cd493f7a",
+        "name": "Task Management API v1",
+        "description": "Complete Task Management API collection. Run Login first to store the Bearer token automatically.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "apikey",
+        "apikey": [
+            { "key": "key", "value": "Authorization", "type": "string" },
+            { "key": "value", "value": "{{token}}", "type": "string" },
+            { "key": "in", "value": "header", "type": "string" }
+        ]
+    },
+    "variable": [
+        { "key": "base_url", "value": "http://127.0.0.1:8000", "type": "string" },
+        { "key": "token", "value": "", "type": "string" },
+        { "key": "project_id", "value": "1", "type": "string" },
+        { "key": "task_id", "value": "1", "type": "string" }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register",
+                    "auth": { "type": "noauth" },
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                                "const json = pm.response.json();",
+                                "if (json.data?.token) pm.collectionVariables.set('token', json.data.token);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Postman User\",\n    \"email\": \"postman@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/auth/register"
+                    }
+                },
+                {
+                    "name": "Login",
+                    "auth": { "type": "noauth" },
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                                "const json = pm.response.json();",
+                                "if (json.data?.token) pm.collectionVariables.set('token', json.data.token);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"demo@example.com\",\n    \"password\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/auth/login"
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                                "if (pm.response.code === 200) pm.collectionVariables.unset('token');"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/auth/logout"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Projects",
+            "item": [
+                {
+                    "name": "List Projects",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects?per_page=15"
+                    }
+                },
+                {
+                    "name": "Create Project",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                                "const json = pm.response.json();",
+                                "if (json.data?.id) pm.collectionVariables.set('project_id', json.data.id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Postman Project\",\n    \"description\": \"Created from Postman\",\n    \"status\": \"active\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/projects"
+                    }
+                },
+                {
+                    "name": "View Project",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
+                    }
+                },
+                {
+                    "name": "Update Project",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Updated Postman Project\",\n    \"status\": \"completed\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
+                    }
+                },
+                {
+                    "name": "Delete Project",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Tasks",
+            "item": [
+                {
+                    "name": "List and Filter Tasks",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/tasks?status=todo&priority=high&search=report&per_page=15"
+                    }
+                },
+                {
+                    "name": "Create Task",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                                "const json = pm.response.json();",
+                                "if (json.data?.id) pm.collectionVariables.set('task_id', json.data.id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Prepare report\",\n    \"description\": \"Prepare the assessment report\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"due_date\": \"2026-08-10 12:00:00\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/tasks"
+                    }
+                },
+                {
+                    "name": "Update Task",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"priority\": \"medium\",\n    \"status\": \"done\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
+                    }
+                },
+                {
+                    "name": "Delete Task",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "item": [{
+                "name": "Dashboard Statistics",
+                "request": {
+                    "method": "GET",
+                    "header": [{ "key": "Accept", "value": "application/json" }],
+                    "url": "{{base_url}}/api/v1/dashboard"
+                }
+            }]
+        }
+    ]
+}
