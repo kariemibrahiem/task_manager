@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class ProjectPolicy
 {
@@ -12,7 +13,7 @@ class ProjectPolicy
         return true;
     }
 
-    public function view(User $user, Project $project): bool
+    public function view(User $user, Project $project): Response
     {
         return $this->owns($user, $project);
     }
@@ -22,18 +23,20 @@ class ProjectPolicy
         return true;
     }
 
-    public function update(User $user, Project $project): bool
+    public function update(User $user, Project $project): Response
     {
         return $this->owns($user, $project);
     }
 
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user, Project $project): Response
     {
         return $this->owns($user, $project);
     }
 
-    private function owns(User $user, Project $project): bool
+    private function owns(User $user, Project $project): Response
     {
-        return $user->id === $project->user_id;
+        return $user->id === $project->user_id
+            ? Response::allow()
+            : Response::deny('This project does not belong to your account.');
     }
 }

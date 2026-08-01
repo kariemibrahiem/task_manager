@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'active' => EnsureUserIsActive::class,
+            'admin' => EnsureUserIsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $errorResponse = static function (
@@ -72,7 +77,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Request $request,
         ) use ($errorResponse): ?JsonResponse {
             return $request->is('api/*')
-                ? $errorResponse('This action is unauthorized.', Response::HTTP_FORBIDDEN)
+                ? $errorResponse(
+                    $exception->getMessage() ?: 'This action is unauthorized.',
+                    Response::HTTP_FORBIDDEN,
+                )
                 : null;
         });
 
@@ -95,7 +103,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         $exceptions->render(function (
-            \Throwable $exception,
+            Throwable $exception,
             Request $request,
         ) use ($errorResponse): ?JsonResponse {
             if (! $request->is('api/*')) {
@@ -108,6 +116,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             $message = match ($status) {
                 Response::HTTP_NOT_FOUND => 'Resource not found.',
+                Response::HTTP_FORBIDDEN => $exception->getMessage() ?: 'This action is unauthorized.',
                 Response::HTTP_METHOD_NOT_ALLOWED => 'Method not allowed.',
                 Response::HTTP_INTERNAL_SERVER_ERROR => 'An unexpected error occurred.',
                 default => Response::$statusTexts[$status] ?? 'Request failed.',

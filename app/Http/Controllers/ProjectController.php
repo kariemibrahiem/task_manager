@@ -53,9 +53,11 @@ class ProjectController extends Controller
                 'comments.user',
                 'comments.media',
                 'media',
+                'tags',
                 'tasks.comments.user',
                 'tasks.comments.media',
                 'tasks.media',
+                'tasks.tags',
             ])->loadCount('tasks')),
             'Project retrieved successfully.',
         );

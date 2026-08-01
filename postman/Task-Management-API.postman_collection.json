@@ -1,485 +1,1510 @@
 {
-    "info": {
-        "_postman_id": "be21e3a7-b667-4e47-b745-41f8cd493f7a",
-        "name": "Task Management API v1",
-        "description": "Complete Task Management API collection. Run Login first to store the Bearer token automatically.",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "auth": {
-        "type": "apikey",
-        "apikey": [
-            { "key": "key", "value": "Authorization", "type": "string" },
-            { "key": "value", "value": "{{token}}", "type": "string" },
-            { "key": "in", "value": "header", "type": "string" }
-        ]
-    },
-    "variable": [
-        { "key": "base_url", "value": "http://127.0.0.1:8000", "type": "string" },
-        { "key": "token", "value": "", "type": "string" },
-        { "key": "project_id", "value": "1", "type": "string" },
-        { "key": "task_id", "value": "1", "type": "string" },
-        { "key": "comment_id", "value": "1", "type": "string" },
-        { "key": "media_id", "value": "1", "type": "string" },
-        { "key": "activity_log_id", "value": "1", "type": "string" }
-    ],
-    "item": [
-        {
-            "name": "Authentication",
-            "item": [
-                {
-                    "name": "Register",
-                    "auth": { "type": "noauth" },
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                                "const json = pm.response.json();",
-                                "if (json.data?.token) pm.collectionVariables.set('token', json.data.token);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Postman User\",\n    \"email\": \"postman@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/auth/register"
-                    }
-                },
-                {
-                    "name": "Login",
-                    "auth": { "type": "noauth" },
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                                "const json = pm.response.json();",
-                                "if (json.data?.token) pm.collectionVariables.set('token', json.data.token);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"email\": \"demo@example.com\",\n    \"password\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/auth/login"
-                    }
-                },
-                {
-                    "name": "Logout",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                                "if (pm.response.code === 200) pm.collectionVariables.unset('token');"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/auth/logout"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Projects",
-            "item": [
-                {
-                    "name": "List Projects",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects?per_page=15"
-                    }
-                },
-                {
-                    "name": "Create Project",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                                "const json = pm.response.json();",
-                                "if (json.data?.id) pm.collectionVariables.set('project_id', json.data.id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Postman Project\",\n    \"description\": \"Created from Postman\",\n    \"status\": \"active\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/projects"
-                    }
-                },
-                {
-                    "name": "View Project",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
-                    }
-                },
-                {
-                    "name": "Update Project",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Updated Postman Project\",\n    \"status\": \"completed\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
-                    }
-                },
-                {
-                    "name": "Delete Project",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Tasks",
-            "item": [
-                {
-                    "name": "List and Filter Tasks",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/tasks?status=todo&priority=high&search=report&per_page=15"
-                    }
-                },
-                {
-                    "name": "Create Task",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                                "const json = pm.response.json();",
-                                "if (json.data?.id) pm.collectionVariables.set('task_id', json.data.id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"title\": \"Prepare report\",\n    \"description\": \"Prepare the assessment report\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"due_date\": \"2026-08-10 12:00:00\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/tasks"
-                    }
-                },
-                {
-                    "name": "View Task",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
-                    }
-                },
-                {
-                    "name": "Update Task",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"priority\": \"medium\",\n    \"status\": \"done\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
-                    }
-                },
-                {
-                    "name": "Delete Task",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Comments",
-            "item": [
-                {
-                    "name": "List Project Comments",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/comments?per_page=15"
-                    }
-                },
-                {
-                    "name": "Create Project Comment",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "const json = pm.response.json();",
-                                "if (json.data?.id) pm.collectionVariables.set('comment_id', json.data.id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"body\": \"Project comment from Postman\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/comments"
-                    }
-                },
-                {
-                    "name": "List Task Comments",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/comments?per_page=15"
-                    }
-                },
-                {
-                    "name": "Create Task Comment",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "const json = pm.response.json();",
-                                "if (json.data?.id) pm.collectionVariables.set('comment_id', json.data.id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"body\": \"Task comment from Postman\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/comments"
-                    }
-                },
-                {
-                    "name": "View Comment",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
-                    }
-                },
-                {
-                    "name": "Update Comment",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"body\": \"Updated comment\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
-                    }
-                },
-                {
-                    "name": "Delete Comment",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Media",
-            "item": [
-                {
-                    "name": "List Project Media",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/media?per_page=15"
-                    }
-                },
-                {
-                    "name": "Upload Project Media",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "const json = pm.response.json();",
-                                "if (json.data?.id) pm.collectionVariables.set('media_id', json.data.id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [
-                                { "key": "file", "type": "file", "src": "" },
-                                { "key": "name", "value": "Project attachment", "type": "text" }
-                            ]
-                        },
-                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/media"
-                    }
-                },
-                {
-                    "name": "List Task Media",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/media?per_page=15"
-                    }
-                },
-                {
-                    "name": "Upload Task Media",
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [{ "key": "file", "type": "file", "src": "" }]
-                        },
-                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/media"
-                    }
-                },
-                {
-                    "name": "List Comment Media",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}/media?per_page=15"
-                    }
-                },
-                {
-                    "name": "Upload Comment Media",
-                    "request": {
-                        "method": "POST",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "formdata",
-                            "formdata": [{ "key": "file", "type": "file", "src": "" }]
-                        },
-                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}/media"
-                    }
-                },
-                {
-                    "name": "View Media",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
-                    }
-                },
-                {
-                    "name": "Rename Media",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"name\": \"Renamed attachment\"\n}",
-                            "options": { "raw": { "language": "json" } }
-                        },
-                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
-                    }
-                },
-                {
-                    "name": "Delete Media",
-                    "request": {
-                        "method": "DELETE",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Activity Logs",
-            "item": [
-                {
-                    "name": "List Activity Logs",
-                    "event": [{
-                        "listen": "test",
-                        "script": {
-                            "type": "text/javascript",
-                            "exec": [
-                                "const json = pm.response.json();",
-                                "if (json.data?.items?.[0]?.id) pm.collectionVariables.set('activity_log_id', json.data.items[0].id);"
-                            ]
-                        }
-                    }],
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/activity-logs?per_page=15"
-                    }
-                },
-                {
-                    "name": "Filter Activity Logs",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/activity-logs?event=updated&per_page=15"
-                    }
-                },
-                {
-                    "name": "View Activity Log",
-                    "request": {
-                        "method": "GET",
-                        "header": [{ "key": "Accept", "value": "application/json" }],
-                        "url": "{{base_url}}/api/v1/activity-logs/{{activity_log_id}}"
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Dashboard",
-            "item": [{
-                "name": "Dashboard Statistics",
-                "request": {
-                    "method": "GET",
-                    "header": [{ "key": "Accept", "value": "application/json" }],
-                    "url": "{{base_url}}/api/v1/dashboard"
-                }
-            }]
-        }
-    ]
+    "info":  {
+                 "_postman_id":  "be21e3a7-b667-4e47-b745-41f8cd493f7a",
+                 "name":  "Task Management API v1",
+                 "description":  "Complete Task Management API collection for user and administrator cycles. Run User Login or Admin Login first to store the authorization token automatically.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "auth":  {
+                 "type":  "noauth"
+             },
+    "variable":  [
+                     {
+                         "key":  "base_url",
+                         "value":  "http://127.0.0.1:8000",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "project_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "task_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "comment_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "media_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "activity_log_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "notification_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "tag_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "admin_user_id",
+                         "value":  "1",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "admin_email",
+                         "value":  "admin@task.test",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "admin_password",
+                         "value":  "Admin@123456",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "user_token",
+                         "value":  "",
+                         "type":  "string"
+                     },
+                     {
+                         "key":  "admin_token",
+                         "value":  "",
+                         "type":  "string"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "User",
+                     "item":  [
+                                  {
+                                      "name":  "Authentication",
+                                      "item":  [
+                                                   {
+                                                       "name":  "Register",
+                                                       "auth":  {
+                                                                    "type":  "noauth"
+                                                                },
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 201\u0027, () =\u003e pm.response.to.have.status(201));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.token) pm.collectionVariables.set(\u0027user_token\u0027, json.data.token);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Postman User\",\n    \"email\": \"postman@example.com\",\n    \"password\": \"Password123\",\n    \"password_confirmation\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/auth/register",
+                                                                       "description":  "Create a user account.\n\nRequired JSON: name (max 255), email (unique), password, password_confirmation.\nPassword: minimum 8 characters with uppercase, lowercase and number.\nOptional: device_name (max 100).\nRole is always user and status is active."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Login",
+                                                       "auth":  {
+                                                                    "type":  "noauth"
+                                                                },
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.token) pm.collectionVariables.set(\u0027user_token\u0027, json.data.token);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"email\": \"demo@example.com\",\n    \"password\": \"Password123\",\n    \"device_name\": \"Postman\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/auth/login",
+                                                                       "description":  "Authenticate an active user and save the returned token automatically.\n\nRequired JSON: email, password.\nOptional: device_name (max 100)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Logout",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "if (pm.response.code === 200) pm.collectionVariables.unset(\u0027user_token\u0027);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/auth/logout",
+                                                                       "description":  "Authentication: Bearer token required.\n\nNo body or query parameters. Revokes only the current Sanctum token and clears the collection token."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Projects",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Projects",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nReturns only projects owned by the current user.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Create Project",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 201\u0027, () =\u003e pm.response.to.have.status(201));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027project_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Postman Project\",\n    \"description\": \"Created from Postman\",\n    \"status\": \"active\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/projects",
+                                                                       "description":  "Authentication: Bearer token required.\n\nRequired JSON: name (string, max 255).\nOptional: description (string|null), status.\nAllowed status: active, completed, archived. Default: active."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Project",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id.\nNo body or query parameters. Returns tasks, comments, media and tags when loaded. Ownership required."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Project",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Updated Postman Project\",\n    \"status\": \"completed\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id.\nAll JSON fields optional: name (max 255), description (string|null), status.\nAllowed status: active, completed, archived. At least one field is recommended."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Project",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id.\nNo body or query parameters. Performs a soft delete. Ownership required."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Tasks",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List and Filter Tasks",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/tasks?status=todo\u0026priority=high\u0026search=report\u0026per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id.\nOptional query: status, priority, search, per_page.\nStatus: todo, in_progress, done.\nPriority: low, medium, high.\nsearch: title keywords (max 255). per_page: 1-100, default 15."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Create Task",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 201\u0027, () =\u003e pm.response.to.have.status(201));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027task_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"title\": \"Prepare report\",\n    \"description\": \"Prepare the assessment report\",\n    \"priority\": \"high\",\n    \"status\": \"todo\",\n    \"due_date\": \"2026-08-10 12:00:00\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/tasks",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id.\nRequired JSON: title (max 255).\nOptional: description, priority, status, due_date.\nPriority: low, medium, high. Default: low.\nStatus: todo, in_progress, done. Default: todo.\ndue_date: valid date/datetime or null."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Task",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: task_id.\nNo body or query parameters. Ownership is checked through the parent project."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Task",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"priority\": \"medium\",\n    \"status\": \"done\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: task_id.\nAll JSON fields optional: title, description, priority, status, due_date.\nPriority: low, medium, high.\nStatus: todo, in_progress, done.\ncompleted_at is managed automatically from status."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Task",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: task_id.\nNo body or query parameters. Performs a soft delete."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Comments",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Project Comments",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/comments?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id or task_id according to the request.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Create Project Comment",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027comment_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"body\": \"Project comment from Postman\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/comments",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id or task_id according to the request.\nRequired JSON: body (string, max 5000)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "List Task Comments",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/comments?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id or task_id according to the request.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Create Task Comment",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027comment_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"body\": \"Task comment from Postman\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/comments",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id or task_id according to the request.\nRequired JSON: body (string, max 5000)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Comment",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/comments/{{comment_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: comment_id.\nNo body or query parameters. Owner-scope authorization applies."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Comment",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"body\": \"Updated comment\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/comments/{{comment_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: comment_id.\nRequired JSON: body (string, max 5000). Only the comment author can update it."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Comment",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/comments/{{comment_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: comment_id.\nNo body or query parameters. Performs a soft delete."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Media",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Project Media",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/media?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id, task_id or comment_id according to the request.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Upload Project Media",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027media_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "formdata",
+                                                                                    "formdata":  [
+                                                                                                     {
+                                                                                                         "key":  "file",
+                                                                                                         "type":  "file",
+                                                                                                         "src":  ""
+                                                                                                     },
+                                                                                                     {
+                                                                                                         "key":  "name",
+                                                                                                         "value":  "Project attachment",
+                                                                                                         "type":  "text"
+                                                                                                     }
+                                                                                                 ]
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/media",
+                                                                       "description":  "Authentication: Bearer token required.\n\nContent-Type: multipart/form-data.\nRequired: file (max 10 MB).\nOptional: name (string|null, max 255).\nAllowed extensions: jpg, jpeg, png, webp, pdf, txt, csv, doc, docx, xls, xlsx."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "List Task Media",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/media?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id, task_id or comment_id according to the request.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Upload Task Media",
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "formdata",
+                                                                                    "formdata":  [
+                                                                                                     {
+                                                                                                         "key":  "file",
+                                                                                                         "type":  "file",
+                                                                                                         "src":  ""
+                                                                                                     }
+                                                                                                 ]
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/media",
+                                                                       "description":  "Authentication: Bearer token required.\n\nContent-Type: multipart/form-data.\nRequired: file (max 10 MB).\nOptional: name (string|null, max 255).\nAllowed extensions: jpg, jpeg, png, webp, pdf, txt, csv, doc, docx, xls, xlsx."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "List Comment Media",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/comments/{{comment_id}}/media?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: project_id, task_id or comment_id according to the request.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Upload Comment Media",
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "formdata",
+                                                                                    "formdata":  [
+                                                                                                     {
+                                                                                                         "key":  "file",
+                                                                                                         "type":  "file",
+                                                                                                         "src":  ""
+                                                                                                     }
+                                                                                                 ]
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/comments/{{comment_id}}/media",
+                                                                       "description":  "Authentication: Bearer token required.\n\nContent-Type: multipart/form-data.\nRequired: file (max 10 MB).\nOptional: name (string|null, max 255).\nAllowed extensions: jpg, jpeg, png, webp, pdf, txt, csv, doc, docx, xls, xlsx."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Media",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/media/{{media_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: media_id.\nNo body or query parameters. Returns metadata and public URL after ownership validation."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Rename Media",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Renamed attachment\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/media/{{media_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: media_id.\nRequired JSON: name (string, max 255). This changes the display name, not the stored filename."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Media",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/media/{{media_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: media_id.\nNo body or query parameters. Deletes the database record and physical media files."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Activity Logs",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Activity Logs",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027activity_log_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/activity-logs?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nReturns only the current user\u0027s activity.\nOptional query: event (string, max 50), per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Filter Activity Logs",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/activity-logs?event=updated\u0026per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nOptional query: event and per_page.\nevent examples: created, updated, deleted, media_uploaded, tag_attached.\nper_page: integer 1-100, default 15."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Activity Log",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/activity-logs/{{activity_log_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: activity_log_id.\nNo body or query parameters. Users can only view their own log entries."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Notifications",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Notifications and Mark Page Seen",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027notification_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/notifications?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nOptional query: per_page (integer 1-100, default 15).\nImportant: every notification returned on this page is marked seen=1 and receives seen_at."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Notification and Mark Seen",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/notifications/{{notification_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: notification_id.\nNo body or query parameters. Accessing it marks seen=1 and sets seen_at."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Tags",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Tags",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027tag_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tags?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required.\n\nReturns tags owned by the current user.\nOptional query: per_page (integer 1-100, default 15)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Create Tag",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 201\u0027, () =\u003e pm.response.to.have.status(201));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.id) pm.collectionVariables.set(\u0027tag_id\u0027, json.data.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Urgent\",\n    \"color\": \"#FF0000\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/tags",
+                                                                       "description":  "Authentication: Bearer token required.\n\nRequired JSON: name (string, max 50, unique per user).\nOptional: color (null or hex format #RRGGBB, example #FF0000).\nslug is generated automatically."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Tag",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: tag_id.\nNo body or query parameters. Returns project/task usage counts."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Tag",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Critical\",\n    \"color\": \"#DC2626\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: tag_id.\nAll JSON fields optional: name (max 50, unique per user), color (null or #RRGGBB).\nChanging name regenerates slug."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Attach Tag to Project",
+                                                       "request":  {
+                                                                       "method":  "PUT",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variables: project_id, tag_id.\nNo body or query parameters. Both records must belong to the current user. Repeated attach is idempotent."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Detach Tag from Project",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/projects/{{project_id}}/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variables: project_id, tag_id.\nNo body or query parameters. Removes only the pivot relation."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Attach Tag to Task",
+                                                       "request":  {
+                                                                       "method":  "PUT",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variables: task_id, tag_id.\nNo body or query parameters. Task project and tag must belong to the current user. Repeated attach is idempotent."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Detach Tag from Task",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tasks/{{task_id}}/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variables: task_id, tag_id.\nNo body or query parameters. Removes only the pivot relation."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Tag",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required.\n\nPath variable: tag_id.\nNo body or query parameters. Detaches it from projects/tasks and performs a soft delete."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Dashboard",
+                                      "item":  [
+                                                   {
+                                                       "name":  "Dashboard Statistics",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/dashboard",
+                                                                       "description":  "Authentication: Bearer token required.\n\nNo body or query parameters.\nReturns: total_projects, active_projects, total_tasks, completed_tasks, pending_tasks, overdue_tasks, unread_notifications."
+                                                                   }
+                                                   }
+                                               ]
+                                  }
+                              ],
+                     "auth":  {
+                                  "type":  "apikey",
+                                  "apikey":  [
+                                                 {
+                                                     "key":  "key",
+                                                     "value":  "Authorization",
+                                                     "type":  "string"
+                                                 },
+                                                 {
+                                                     "key":  "value",
+                                                     "value":  "{{user_token}}",
+                                                     "type":  "string"
+                                                 },
+                                                 {
+                                                     "key":  "in",
+                                                     "value":  "header",
+                                                     "type":  "string"
+                                                 }
+                                             ]
+                              }
+                 },
+                 {
+                     "name":  "Admin",
+                     "item":  [
+                                  {
+                                      "name":  "Authentication",
+                                      "item":  [
+                                                   {
+                                                       "name":  "Admin Login",
+                                                       "auth":  {
+                                                                    "type":  "noauth"
+                                                                },
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.token) pm.collectionVariables.set(\u0027admin_token\u0027, json.data.token);",
+                                                                                                     "pm.test(\u0027User is admin\u0027, () =\u003e pm.expect(json.data?.user?.role).to.eql(\u0027admin\u0027));"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\",\n    \"device_name\": \"Postman Admin\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/auth/login",
+                                                                       "description":  "Authenticate as administrator and save the returned token automatically.\n\nRequired JSON: email, password.\nOptional: device_name (max 100).\nCollection variables: admin_email, admin_password."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Admin Logout",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "if (pm.response.code === 200) pm.collectionVariables.unset(\u0027admin_token\u0027);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "POST",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/auth/logout",
+                                                                       "description":  "Authentication: Bearer token required.\n\nNo body or query parameters. Revokes only the current Sanctum token and clears the collection token."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Dashboard",
+                                      "item":  [
+                                                   {
+                                                       "name":  "Admin Dashboard",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/dashboard",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role and active status required.\n\nNo body or query parameters.\nReturns platform totals for users, projects, tasks, overdue tasks and tags."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Users",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List Users",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "const target = json.data?.items?.find(user =\u003e user.role !== \u0027admin\u0027) || json.data?.items?.[0];",
+                                                                                                     "if (target?.id) pm.collectionVariables.set(\u0027admin_user_id\u0027, target.id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/users?role=user\u0026status=active\u0026per_page=15",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nOptional query: role, status, search, per_page.\nrole: admin, user. status: active, suspended.\nsearch: name/email (max 255). per_page: 1-100."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View User",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/users/{{admin_user_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: admin_user_id.\nNo body or query parameters. Returns role, status and resource counts."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update User Access",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"role\": \"user\",\n    \"status\": \"active\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/admin/users/{{admin_user_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: admin_user_id.\nJSON requires at least one: role or status.\nrole: admin, user. status: active, suspended.\nSuspending revokes all tokens. Self lockout and removal of the last admin are blocked."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete User",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/users/{{admin_user_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: admin_user_id.\nNo body or query parameters. Revokes tokens and soft-deletes the user. Self/last-admin deletion is blocked."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Projects",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List All Projects",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "pm.test(\u0027Status is 200\u0027, () =\u003e pm.response.to.have.status(200));",
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027project_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/projects?status=active\u0026per_page=15",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nOptional query: user_id, status, search, per_page.\nstatus: active, completed, archived. per_page: 1-100."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Any Project",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: project_id.\nNo body or query parameters. Can view any project and its owner."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Any Project",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"status\": \"active\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/admin/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: project_id.\nAll JSON fields optional: name, description, status.\nstatus: active, completed, archived."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Any Project",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/projects/{{project_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: project_id.\nNo body or query parameters. Soft-deletes any project."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Tasks",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List All Tasks",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027task_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tasks?priority=high\u0026overdue=0\u0026per_page=15",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nOptional query: user_id, project_id, status, priority, overdue, search, per_page.\nstatus: todo, in_progress, done. priority: low, medium, high.\noverdue: true/false or 1/0. per_page: 1-100."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Any Task",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: task_id.\nNo body or query parameters. Can view any task with project owner details."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Any Task",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"priority\": \"high\",\n    \"status\": \"in_progress\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/admin/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: task_id.\nAll JSON fields optional: title, description, priority, status, due_date.\npriority: low, medium, high. status: todo, in_progress, done."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Any Task",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tasks/{{task_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: task_id.\nNo body or query parameters. Soft-deletes any task."
+                                                                   }
+                                                   }
+                                               ]
+                                  },
+                                  {
+                                      "name":  "Tags",
+                                      "item":  [
+                                                   {
+                                                       "name":  "List All Tags",
+                                                       "event":  [
+                                                                     {
+                                                                         "listen":  "test",
+                                                                         "script":  {
+                                                                                        "type":  "text/javascript",
+                                                                                        "exec":  [
+                                                                                                     "const json = pm.response.json();",
+                                                                                                     "if (json.data?.items?.[0]?.id) pm.collectionVariables.set(\u0027tag_id\u0027, json.data.items[0].id);"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                                 ],
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tags?per_page=15",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nOptional query: user_id, search, per_page.\nsearch: tag name (max 255). per_page: 1-100."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "View Any Tag",
+                                                       "request":  {
+                                                                       "method":  "GET",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: tag_id.\nNo body or query parameters. Can view any tag and its owner."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Update Any Tag",
+                                                       "request":  {
+                                                                       "method":  "PATCH",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "body":  {
+                                                                                    "mode":  "raw",
+                                                                                    "raw":  "{\n    \"name\": \"Admin Reviewed\",\n    \"color\": \"#2563EB\"\n}",
+                                                                                    "options":  {
+                                                                                                    "raw":  {
+                                                                                                                "language":  "json"
+                                                                                                            }
+                                                                                                }
+                                                                                },
+                                                                       "url":  "{{base_url}}/api/v1/admin/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: tag_id.\nAll JSON fields optional: name (max 50, unique for owner), color (null or #RRGGBB)."
+                                                                   }
+                                                   },
+                                                   {
+                                                       "name":  "Delete Any Tag",
+                                                       "request":  {
+                                                                       "method":  "DELETE",
+                                                                       "header":  [
+                                                                                      {
+                                                                                          "key":  "Accept",
+                                                                                          "value":  "application/json"
+                                                                                      }
+                                                                                  ],
+                                                                       "url":  "{{base_url}}/api/v1/admin/tags/{{tag_id}}",
+                                                                       "description":  "Authentication: Bearer token required. Administrator role required.\n\nPath variable: tag_id.\nNo body or query parameters. Detaches relations and soft-deletes any tag."
+                                                                   }
+                                                   }
+                                               ]
+                                  }
+                              ],
+                     "auth":  {
+                                  "type":  "apikey",
+                                  "apikey":  [
+                                                 {
+                                                     "key":  "key",
+                                                     "value":  "Authorization",
+                                                     "type":  "string"
+                                                 },
+                                                 {
+                                                     "key":  "value",
+                                                     "value":  "{{admin_token}}",
+                                                     "type":  "string"
+                                                 },
+                                                 {
+                                                     "key":  "in",
+                                                     "value":  "header",
+                                                     "type":  "string"
+                                                 }
+                                             ]
+                              }
+                 }
+             ]
 }
