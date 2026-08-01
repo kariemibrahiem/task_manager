@@ -2,65 +2,41 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IndexActivityLogRequest;
+use App\Http\Resources\ActivityLogResource;
 use App\Models\ActivityLog;
-use App\Http\Requests\StoreActivityLogRequest;
-use App\Http\Requests\UpdateActivityLogRequest;
+use App\Services\ActivityLogService;
+use App\Traits\ApiTrait;
+use Illuminate\Http\JsonResponse;
 
 class ActivityLogController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ApiTrait;
+
+    public function __construct(private readonly ActivityLogService $activityLogs) {}
+
+    public function index(IndexActivityLogRequest $request): JsonResponse
     {
-        //
+        $this->authorize('viewAny', ActivityLog::class);
+        $activityLogs = $this->activityLogs->paginate(
+            $request->user(),
+            $request->safe()->only(['event']),
+            (int) $request->validated('per_page', 15),
+        );
+
+        return $this->paginatedResponse(
+            ActivityLogResource::collection($activityLogs),
+            'Activity logs retrieved successfully.',
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(ActivityLog $activityLog): JsonResponse
     {
-        //
-    }
+        $this->authorize('view', $activityLog);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreActivityLogRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(ActivityLog $activityLog)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ActivityLog $activityLog)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateActivityLogRequest $request, ActivityLog $activityLog)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ActivityLog $activityLog)
-    {
-        //
+        return $this->successResponse(
+            new ActivityLogResource($activityLog),
+            'Activity log retrieved successfully.',
+        );
     }
 }

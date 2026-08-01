@@ -46,6 +46,16 @@ class TaskController extends Controller
         );
     }
 
+    public function show(Task $task): JsonResponse
+    {
+        $this->authorize('view', $task->project);
+
+        return $this->successResponse(
+            new TaskResource($task->load(['comments.user', 'comments.media', 'media'])),
+            'Task retrieved successfully.',
+        );
+    }
+
     public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
         $this->authorize('update', $task);

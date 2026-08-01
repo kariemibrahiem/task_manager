@@ -17,6 +17,7 @@ class DashboardResource extends JsonResource
             'completed_tasks' => (int) $this['completed_tasks'],
             'pending_tasks' => (int) $this['pending_tasks'],
             'overdue_tasks' => (int) $this['overdue_tasks'],
+            'unread_notifications' => (int) $this['unread_notifications'],
         ];
     }
 }
