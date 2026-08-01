@@ -1,66 +1,231 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A clean Laravel 11 REST API for managing personal projects and tasks. It includes token authentication, authorization, searchable task lists, dashboard statistics, comments, media attachments, activity logs, and queued background work.
 
-## About Laravel
+## What is included?
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laravel Sanctum authentication: register, login, and logout
+- User-owned projects with full CRUD operations
+- Project tasks with status, priority, due dates, search, filters, and pagination
+- Dashboard statistics, including pending and overdue tasks
+- Polymorphic comments for projects and tasks
+- Secure media attachments powered by Spatie Media Library
+- Queued activity logging
+- Form Requests, API Resources, Policies, Services, and Repositories
+- Consistent JSON responses and API error handling
+- Factories, queued sample-data seeders, and feature tests
+- Versioned endpoints under `/api/v1`
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Composer
+- MySQL 8+ or SQLite
+- PHP extensions required by Laravel
 
-## Learning Laravel
+## Quick start
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+git clone <repository-url>
+cd Task_management
+composer install
+cp .env.example .env
+php artisan key:generate
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Create a database, update the database variables in `.env`, then run:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+php artisan migrate
+php artisan storage:link
+php artisan serve
+```
 
-## Laravel Sponsors
+The API will be available at:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```text
+http://127.0.0.1:8000/api/v1
+```
 
-### Premium Partners
+> Keep `APP_URL` equal to the public application URL. Spatie Media Library uses it when generating attachment URLs.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Environment setup
 
-## Contributing
+MySQL example:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```dotenv
+APP_NAME="Task Management API"
+APP_URL=http://127.0.0.1:8000
 
-## Code of Conduct
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=task_management
+DB_USERNAME=root
+DB_PASSWORD=
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+FILESYSTEM_DISK=public
+QUEUE_CONNECTION=database
+```
 
-## Security Vulnerabilities
+Mail credentials are intentionally excluded from the repository. Add the credentials for your own mail provider only to `.env`; never commit them.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Run background jobs
+
+Activity logs, sample-data seeding, and notifications use Laravel queues. Keep a worker running during development:
+
+```bash
+php artisan queue:work --tries=3
+```
+
+To load sample data, dispatch the queued seeder and let the worker process it:
+
+```bash
+php artisan db:seed
+```
+
+For scheduled jobs, run this locally in a separate terminal:
+
+```bash
+php artisan schedule:work
+```
+
+## Authentication
+
+Register or log in to receive a Sanctum token. Send it with protected requests:
+
+```http
+Authorization: Bearer YOUR_TOKEN
+Accept: application/json
+```
+
+Example login request:
+
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "developer@example.com",
+  "password": "password",
+  "device_name": "Postman"
+}
+```
+
+## Main endpoints
+
+| Module | Method and endpoint | Purpose |
+|---|---|---|
+| Auth | `POST /auth/register` | Create an account |
+| Auth | `POST /auth/login` | Create an access token |
+| Auth | `POST /auth/logout` | Revoke the current token |
+| Dashboard | `GET /dashboard` | Return the user's statistics |
+| Projects | `GET/POST /projects` | List or create projects |
+| Projects | `GET/PUT/PATCH/DELETE /projects/{project}` | Manage one project |
+| Tasks | `GET/POST /projects/{project}/tasks` | List or create project tasks |
+| Tasks | `GET/PUT/PATCH/DELETE /tasks/{task}` | Manage one task |
+| Comments | `GET/POST /projects/{project}/comments` | Project comments |
+| Comments | `GET/POST /tasks/{task}/comments` | Task comments |
+| Comments | `GET/PUT/PATCH/DELETE /comments/{comment}` | Manage one comment |
+| Media | `GET/POST /projects/{project}/media` | Project attachments |
+| Media | `GET/POST /tasks/{task}/media` | Task attachments |
+| Media | `GET/POST /comments/{comment}/media` | Comment attachments |
+| Media | `GET/PATCH/DELETE /media/{media}` | View, rename, or delete media |
+| Activity | `GET /activity-logs` | List the user's activity |
+| Activity | `GET /activity-logs/{activityLog}` | View one activity entry |
+| Notifications | `GET /notifications` | List notifications and mark the returned page as seen |
+| Notifications | `GET /notifications/{notification}` | View one notification and mark it as seen |
+
+All paths in the table are relative to `/api/v1`.
+
+Task listing supports these optional query parameters:
+
+```text
+status=todo|in_progress|done
+priority=low|medium|high
+search=title keywords
+per_page=15
+```
+
+## Response contract
+
+Every endpoint follows the same predictable shape:
+
+```json
+{
+  "success": true,
+  "message": "Request completed successfully.",
+  "data": {}
+}
+```
+
+Errors use the same contract and include `errors` when validation details are available. Empty data is returned as `[]`.
+
+## Architecture at a glance
+
+```text
+HTTP Request
+    ↓
+Form Request (validation)
+    ↓
+Controller (HTTP orchestration + authorization)
+    ↓
+Service (business rules)
+    ↓
+Repository Interface → Eloquent Repository
+    ↓
+Models / Database
+    ↓
+API Resource → Consistent JSON response
+```
+
+- **Policies** prevent users from accessing projects, tasks, comments, media, or logs they do not own.
+- **Services** contain business logic and keep controllers small.
+- **Repository interfaces** separate data access from business logic.
+- **API Resources** control what is exposed to clients.
+- **Jobs** move non-blocking work away from the request lifecycle.
+
+## Media storage
+
+Attachments are isolated by owner model and record:
+
+```text
+storage/app/public/projects/{project_id}/{media_id}/
+storage/app/public/tasks/{task_id}/{media_id}/
+storage/app/public/comments/{comment_id}/{media_id}/
+```
+
+Run `php artisan storage:link` once so public URLs can serve these files.
+
+## Tests and code style
+
+```bash
+php artisan test
+./vendor/bin/pint --test
+```
+
+The feature suite covers authentication, ownership policies, projects, tasks, filters, dashboard statistics, comments, media, activity logs, pagination, validation, rate limiting, and queued seeders.
+
+## Postman
+
+Import the collection from:
+
+```text
+postman/Task-Management-API.postman_collection.json
+```
+
+Set `base_url` to `http://127.0.0.1:8000`. The login request stores the returned token for authenticated requests.
+
+## Useful production commands
+
+```bash
+php artisan migrate --force
+php artisan optimize
+php artisan queue:work --tries=3
+```
+
+In production, run the queue worker under a process monitor and execute `php artisan schedule:run` every minute through cron.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is available under the MIT License.

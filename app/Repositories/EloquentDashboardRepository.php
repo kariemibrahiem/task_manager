@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Contracts\Repositories\DashboardRepositoryInterface;
 use App\Enums\ProjectStatus;
 use App\Enums\TaskStatus;
+use App\Models\OverdueTaskNotification;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -46,6 +47,10 @@ class EloquentDashboardRepository implements DashboardRepositoryInterface
             'completed_tasks' => (int) $tasks->completed_tasks,
             'pending_tasks' => (int) $tasks->pending_tasks,
             'overdue_tasks' => (int) $tasks->overdue_tasks,
+            'unread_notifications' => OverdueTaskNotification::query()
+                ->where('user_id', $user->id)
+                ->where('seen', false)
+                ->count(),
         ];
     }
 }

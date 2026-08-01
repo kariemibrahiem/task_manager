@@ -49,7 +49,14 @@ class ProjectController extends Controller
         $this->authorize('view', $project);
 
         return $this->successResponse(
-            new ProjectResource($project->load('tasks')->loadCount('tasks')),
+            new ProjectResource($project->load([
+                'comments.user',
+                'comments.media',
+                'media',
+                'tasks.comments.user',
+                'tasks.comments.media',
+                'tasks.media',
+            ])->loadCount('tasks')),
             'Project retrieved successfully.',
         );
     }

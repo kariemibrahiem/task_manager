@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\ProjectStatus;
 use App\Enums\TaskStatus;
+use App\Models\OverdueTaskNotification;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -21,7 +22,7 @@ class DashboardApiTest extends TestCase
         $activeProject = Project::factory()->for($user)->create(['status' => ProjectStatus::Active->value]);
         $completedProject = Project::factory()->for($user)->create(['status' => ProjectStatus::Completed->value]);
 
-        Task::factory()->for($activeProject)->create([
+        $overdueTask = Task::factory()->for($activeProject)->create([
             'status' => TaskStatus::Todo->value,
             'due_date' => now()->subDay(),
         ]);
@@ -41,6 +42,26 @@ class DashboardApiTest extends TestCase
             'due_date' => now()->subDay(),
         ]);
 
+        OverdueTaskNotification::query()->create([
+            'user_id' => $user->id,
+            'task_id' => $overdueTask->id,
+            'message' => 'Unread overdue notification.',
+            'seen' => false,
+        ]);
+        OverdueTaskNotification::query()->create([
+            'user_id' => $user->id,
+            'task_id' => $activeProject->tasks()->where('id', '!=', $overdueTask->id)->firstOrFail()->id,
+            'message' => 'Seen overdue notification.',
+            'seen' => true,
+            'seen_at' => now(),
+        ]);
+        OverdueTaskNotification::query()->create([
+            'user_id' => $otherProject->user_id,
+            'task_id' => $otherProject->tasks()->firstOrFail()->id,
+            'message' => 'Another user notification.',
+            'seen' => false,
+        ]);
+
         Sanctum::actingAs($user);
 
         $this->getJson('/api/v1/dashboard')
@@ -51,6 +72,7 @@ class DashboardApiTest extends TestCase
             ->assertJsonPath('data.total_tasks', 3)
             ->assertJsonPath('data.completed_tasks', 1)
             ->assertJsonPath('data.pending_tasks', 2)
-            ->assertJsonPath('data.overdue_tasks', 1);
+            ->assertJsonPath('data.overdue_tasks', 1)
+            ->assertJsonPath('data.unread_notifications', 1);
     }
 }

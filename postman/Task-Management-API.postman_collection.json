@@ -17,7 +17,10 @@
         { "key": "base_url", "value": "http://127.0.0.1:8000", "type": "string" },
         { "key": "token", "value": "", "type": "string" },
         { "key": "project_id", "value": "1", "type": "string" },
-        { "key": "task_id", "value": "1", "type": "string" }
+        { "key": "task_id", "value": "1", "type": "string" },
+        { "key": "comment_id", "value": "1", "type": "string" },
+        { "key": "media_id", "value": "1", "type": "string" },
+        { "key": "activity_log_id", "value": "1", "type": "string" }
     ],
     "item": [
         {
@@ -195,6 +198,14 @@
                     }
                 },
                 {
+                    "name": "View Task",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
+                    }
+                },
+                {
                     "name": "Update Task",
                     "request": {
                         "method": "PATCH",
@@ -213,6 +224,248 @@
                         "method": "DELETE",
                         "header": [{ "key": "Accept", "value": "application/json" }],
                         "url": "{{base_url}}/api/v1/tasks/{{task_id}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Comments",
+            "item": [
+                {
+                    "name": "List Project Comments",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/comments?per_page=15"
+                    }
+                },
+                {
+                    "name": "Create Project Comment",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "const json = pm.response.json();",
+                                "if (json.data?.id) pm.collectionVariables.set('comment_id', json.data.id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"body\": \"Project comment from Postman\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/comments"
+                    }
+                },
+                {
+                    "name": "List Task Comments",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/comments?per_page=15"
+                    }
+                },
+                {
+                    "name": "Create Task Comment",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "const json = pm.response.json();",
+                                "if (json.data?.id) pm.collectionVariables.set('comment_id', json.data.id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"body\": \"Task comment from Postman\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/comments"
+                    }
+                },
+                {
+                    "name": "View Comment",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
+                    }
+                },
+                {
+                    "name": "Update Comment",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"body\": \"Updated comment\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
+                    }
+                },
+                {
+                    "name": "Delete Comment",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Media",
+            "item": [
+                {
+                    "name": "List Project Media",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/media?per_page=15"
+                    }
+                },
+                {
+                    "name": "Upload Project Media",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "const json = pm.response.json();",
+                                "if (json.data?.id) pm.collectionVariables.set('media_id', json.data.id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                { "key": "file", "type": "file", "src": "" },
+                                { "key": "name", "value": "Project attachment", "type": "text" }
+                            ]
+                        },
+                        "url": "{{base_url}}/api/v1/projects/{{project_id}}/media"
+                    }
+                },
+                {
+                    "name": "List Task Media",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/media?per_page=15"
+                    }
+                },
+                {
+                    "name": "Upload Task Media",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [{ "key": "file", "type": "file", "src": "" }]
+                        },
+                        "url": "{{base_url}}/api/v1/tasks/{{task_id}}/media"
+                    }
+                },
+                {
+                    "name": "List Comment Media",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}/media?per_page=15"
+                    }
+                },
+                {
+                    "name": "Upload Comment Media",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [{ "key": "file", "type": "file", "src": "" }]
+                        },
+                        "url": "{{base_url}}/api/v1/comments/{{comment_id}}/media"
+                    }
+                },
+                {
+                    "name": "View Media",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
+                    }
+                },
+                {
+                    "name": "Rename Media",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Renamed attachment\"\n}",
+                            "options": { "raw": { "language": "json" } }
+                        },
+                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
+                    }
+                },
+                {
+                    "name": "Delete Media",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/media/{{media_id}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Activity Logs",
+            "item": [
+                {
+                    "name": "List Activity Logs",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "type": "text/javascript",
+                            "exec": [
+                                "const json = pm.response.json();",
+                                "if (json.data?.items?.[0]?.id) pm.collectionVariables.set('activity_log_id', json.data.items[0].id);"
+                            ]
+                        }
+                    }],
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/activity-logs?per_page=15"
+                    }
+                },
+                {
+                    "name": "Filter Activity Logs",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/activity-logs?event=updated&per_page=15"
+                    }
+                },
+                {
+                    "name": "View Activity Log",
+                    "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Accept", "value": "application/json" }],
+                        "url": "{{base_url}}/api/v1/activity-logs/{{activity_log_id}}"
                     }
                 }
             ]
